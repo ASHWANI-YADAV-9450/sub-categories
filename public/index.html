@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Product Entry (Non-Technical)</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .option-block, .child-block { margin-left: 20px; margin-top: 10px; }
+    button { margin-top: 10px; }
+    pre { background: #f4f4f4; padding: 10px; }
+    .preview { margin-top: 20px; }
+    ul { list-style: none; padding-left: 20px; }
+    li::before { content: "↳ "; color: #888; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h2>Add Product</h2>
+  <form id="productForm">
+    <label>Product Name:<br>
+      <input type="text" id="productName" required />
+    </label>
+
+    <div id="optionsContainer"></div>
+    <button type="button" onclick="addOption()">Add Option</button><br><br>
+
+    <button type="submit">Submit Product</button>
+  </form>
+
+  <div class="preview">
+    <h3>Preview of Final JSON:</h3>
+    <pre id="jsonPreview">{}</pre>
+  </div>
+
+  <div class="preview">
+    <h3>Visual Preview for Non-Technical Users:</h3>
+    <div id="visualPreview"></div>
+  </div>
+
+  <div class="preview">
+    <h3>Table View of Product Options:</h3>
+    <table id="optionsTable">
+      <thead>
+        <tr>
+          <th>Level</th>
+          <th>Option Name</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- <script>
+    const optionsContainer = document.getElementById("optionsContainer");
+    const jsonPreview = document.getElementById("jsonPreview");
+    const visualDiv = document.getElementById("visualPreview");
+
+    function createOptionBlock(level = 0) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "option-block";
+
+      const input = document.createElement("input");
+      input.placeholder = "Option Name (e.g., Brand)";
+      input.required = true;
+
+      wrapper.appendChild(input);
+
+      const childrenDiv = document.createElement("div");
+      childrenDiv.className = "child-block";
+
+      const addChildBtn = document.createElement("button");
+      addChildBtn.type = "button";
+      addChildBtn.textContent = "Add Sub Option";
+      addChildBtn.onclick = () => {
+        childrenDiv.appendChild(createOptionBlock(level + 1));
+      };
+
+      wrapper.appendChild(addChildBtn);
+      wrapper.appendChild(childrenDiv);
+
+      return wrapper;
+    }
+
+    function addOption() {
+      optionsContainer.appendChild(createOptionBlock());
+    }
+
+    function parseOptions(container) {
+      const blocks = container.children;
+      const result = [];
+
+      for (const block of blocks) {
+        const input = block.querySelector("input");
+        const name = input?.value?.trim();
+        if (!name) continue;
+
+        const childContainer = block.querySelector(".child-block");
+        const children = parseOptions(childContainer);
+
+        const obj = { name };
+        if (children.length) obj.children = children;
+
+        result.push(obj);
+      }
+
+      return result;
+    }
+
+    function renderHierarchy(container, nodes) {
+      const ul = document.createElement("ul");
+
+      nodes.forEach(node => {
+        const li = document.createElement("li");
+        li.textContent = node.name;
+
+        if (node.children && node.children.length > 0) {
+          renderHierarchy(li, node.children);
+        }
+
+        ul.appendChild(li);
+      });
+
+      container.appendChild(ul);
+    }
+
+    function renderTable(tableBody, nodes, level = 1) {
+      nodes.forEach(node => {
+        const row = document.createElement("tr");
+
+        const levelCell = document.createElement("td");
+        levelCell.textContent = level;
+        const nameCell = document.createElement("td");
+        nameCell.textContent = node.name;
+
+        row.appendChild(levelCell);
+        row.appendChild(nameCell);
+
+        tableBody.appendChild(row);
+
+        if (node.children && node.children.length > 0) {
+          renderTable(tableBody, node.children, level + 1);
+        }
+      });
+    }
+
+    document.getElementById("productForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("productName").value.trim();
+      const options = parseOptions(optionsContainer);
+
+      const product = { name, options };
+
+      // JSON Preview
+      jsonPreview.textContent = JSON.stringify(product, null, 2);
+
+      // Visual Preview
+      visualDiv.innerHTML = "";
+      renderHierarchy(visualDiv, options);
+
+      // Table Preview
+      const tableBody = document.querySelector("#optionsTable tbody");
+      tableBody.innerHTML = "";
+      renderTable(tableBody, options);
+
+      // Submit Data
+      try {
+        const res = await fetch("http://localhost:3000/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(product)
+        });
+
+        const data = await res.json();
+        alert("Product submitted successfully!");
+        console.log("Submitted:", data);
+      } catch (err) {
+        alert("Error submitting product: " + err.message);
+      }
+    });
+  </script> -->
+
+  <script>
+    const optionsContainer = document.getElementById("optionsContainer");
+    const jsonPreview = document.getElementById("jsonPreview");
+    const visualDiv = document.getElementById("visualPreview");
+    const tableBody = document.querySelector("#optionsTable tbody");
+  
+    function createOptionBlock(level = 0) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "option-block";
+  
+      const input = document.createElement("input");
+      input.placeholder = "Option Name (e.g., Brand)";
+      input.required = true;
+  
+      wrapper.appendChild(input);
+  
+      const childrenDiv = document.createElement("div");
+      childrenDiv.className = "child-block";
+  
+      const addChildBtn = document.createElement("button");
+      addChildBtn.type = "button";
+      addChildBtn.textContent = "Add Sub Option";
+      addChildBtn.onclick = () => {
+        childrenDiv.appendChild(createOptionBlock(level + 1));
+      };
+  
+      wrapper.appendChild(addChildBtn);
+      wrapper.appendChild(childrenDiv);
+  
+      return wrapper;
+    }
+  
+    function addOption() {
+      optionsContainer.appendChild(createOptionBlock());
+    }
+  
+    function parseOptions(container) {
+      const blocks = container.children;
+      const result = [];
+  
+      for (const block of blocks) {
+        const input = block.querySelector("input");
+        const name = input?.value?.trim();
+        if (!name) continue;
+  
+        const childContainer = block.querySelector(".child-block");
+        const children = parseOptions(childContainer);
+  
+        const obj = { name };
+        if (children.length) obj.children = children;
+  
+        result.push(obj);
+      }
+  
+      return result;
+    }
+  
+    function renderHierarchy(container, nodes) {
+      const ul = document.createElement("ul");
+  
+      nodes.forEach(node => {
+        const li = document.createElement("li");
+        li.textContent = node.name;
+  
+        if (node.children && node.children.length > 0) {
+          renderHierarchy(li, node.children);
+        }
+  
+        ul.appendChild(li);
+      });
+  
+      container.appendChild(ul);
+    }
+  
+    function renderTable(tableBody, nodes, level = 1) {
+      console.log("table body"+tableBody)
+      console.log("node body"+nodes)
+      nodes.forEach(node => {
+        const row = document.createElement("tr");
+  
+        const levelCell = document.createElement("td");
+        levelCell.textContent = level;
+        const nameCell = document.createElement("td");
+        nameCell.textContent = node.name;
+  
+        row.appendChild(levelCell);
+        row.appendChild(nameCell);
+  
+        tableBody.appendChild(row);
+  
+        if (node.children && node.children.length > 0) {
+          renderTable(tableBody, node.children, level + 1);
+        }
+      });
+    }
+  
+    // async function fetchAndRenderProduct() {
+    //   try {
+    //     const res = await fetch("http://localhost:3000/api/products");
+        
+    //     const data = await res.json();
+    //     console.log( data)
+  
+    //     const latestProduct = Array.isArray(data) ? data[data.length - 1] : data;
+        
+    //     const { name, options } = latestProduct || { name: '', options: [] };
+  
+    //     // Render JSON preview
+    //     jsonPreview.textContent = JSON.stringify(latestProduct, null);
+  
+    //     // Render visual tree
+    //     visualDiv.innerHTML = "";
+    //     renderHierarchy(visualDiv, options);
+  
+    //     // Render table
+    //     tableBody.innerHTML = "";
+    //     renderTable(tableBody, options);
+  
+    //     // Also optionally fill in product name (if you want to reuse form)
+    //     document.getElementById("productName").value = name;
+  
+    //   } catch (error) {
+    //     console.error("Error fetching product:", error);
+    //     alert("Failed to load product data.");
+    //   }
+    // }
+  
+
+      async function fetchAndRenderAllProducts() {
+    try {
+      const res = await fetch("http://localhost:3000/api/products");
+      const data = await res.json();
+
+      const previewContainer = document.querySelector(".preview");
+      previewContainer.innerHTML = ""; // Clear old content
+
+      data.forEach((product, index) => {
+        // Fix typo if needed
+        const productName = product.name === "Lpatop" ? "Laptop" : product.name;
+        
+        // ✅ Print this in the console as requested
+        console.log(`${productName}:`, product.options);
+
+        // Now continue rendering
+        const title = document.createElement("h3");
+        title.textContent = `Product ${index + 1}: ${productName}`;
+        previewContainer.appendChild(title);
+
+        const jsonTitle = document.createElement("h4");
+        jsonTitle.textContent = "JSON Preview:";
+        const json = document.createElement("pre");
+        json.textContent = JSON.stringify(product, null, 2);
+        previewContainer.appendChild(jsonTitle);
+        previewContainer.appendChild(json);
+
+        const visualTitle = document.createElement("h4");
+        visualTitle.textContent = "Visual Preview:";
+        const visual = document.createElement("div");
+        renderHierarchy(visual, product.options);
+        previewContainer.appendChild(visualTitle);
+        previewContainer.appendChild(visual);
+
+        const tableTitle = document.createElement("h4");
+        tableTitle.textContent = "Table View:";
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr><th>Level</th><th>Option Name</th></tr>
+          </thead>
+          <tbody></tbody>
+        `;
+        // renderTable(table.querySelector("tbody"), product.options);
+        // previewContainer.appendChild(tableTitle);
+        // previewContainer.appendChild(table);
+      });
+
+    } catch (error) {
+      console.error("Error fetching all products:", error);
+      alert("Failed to load product data.");
+    }
+  }
+
+    document.getElementById("productForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+  
+      const name = document.getElementById("productName").value.trim();
+      const options = parseOptions(optionsContainer);
+  
+      const product = { name, options };
+  
+      // JSON Preview
+      jsonPreview.textContent = JSON.stringify(product, null, 2);
+  
+      // Visual Preview
+      visualDiv.innerHTML = "";
+      renderHierarchy(visualDiv, options);
+  
+      // Table Preview
+      tableBody.innerHTML = "";
+      renderTable(tableBody, options);
+  
+      // Submit Data
+      try {
+        const res = await fetch("http://localhost:3000/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(product)
+        });
+  
+        const data = await res.json();
+        alert("Product submitted successfully!");
+        console.log("Submitted:", data);
+  
+        fetchAndRenderAllProducts(); // Refresh data after submission
+      } catch (err) {
+        alert("Error submitting product: " + err.message);
+      }
+    });
+  
+    // 🔁 Load product data on page load
+    window.onload = fetchAndRenderAllProducts;
+  </script>
+  
+</body>
+</html>
